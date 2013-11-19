@@ -78,6 +78,14 @@ proc {ExecuteProgram Program}   % Calls ExecuteStatement with an initial semanti
    MySemStat = Program#myenv
    {ExecuteStatement {PushSemStack MySemStat stack}}
    end
+   local  store myenv newE in
+	store ={NewLocnInStore}
+	{BindLocnValInStore L fprim}
+	myenv={NewEnv}
+	newE={NewEnv}
+	newE={AddMappingE [cout#stack] myenv}
+   end
+ 
 end
 
 
