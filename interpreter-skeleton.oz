@@ -124,23 +124,6 @@ end
 
 proc {ExecuteStatement Stack}	% Executes each kernel statement
 %%% FILL IN %%%%%%%%%%%%%%%%%%%%%
-	% Check if stack is empty
-	% If not, pop top statement off of the stack
-	% Use a case statement to figure out which statement it is
-	% Use the semantics defined in Section 2.4 of the textbook to execute
-	% each statement. Each branch of the case should return the stack that
-	% results from executing that statement. The new stack will be passed as
-	% the argument of the tail recursive call to ExecuteStatement.
-	% Below are the semantics for built-in primitives defined for you. (They have
-	% the same concrete syntax as user-defined function calls, but the parser will figure
-	% out which functions are defined by the user and which are built-in, and assign
-	% different abstract syntax to each as appropriate.)
-	% ****IMPLEMENTATION HINTS: *****
-	% The store operations already handle the single-assignment semantics, so
-	% you don't have to.
-	% fappStmt: Consider using List.zip (see online Oz documentation); otherwise write your own
-	%			recursive function to lookup actual args and pair them with formals.
-	
 	if {Not {StackIsEmpty Stack}} then
 		
 		local
@@ -159,6 +142,9 @@ proc {ExecuteStatement Stack}	% Executes each kernel statement
 				{Procedure.apply {LookupInStore {LookupInEnv X E}} Args}
 				NewStack = OutStack
 			[] seqStmt(S1 S2) then 
+	    		Stmt = {LookupInStor S1 S2} in 
+	    		{PopSemStack S2 S1}
+	    		
 			[] newvarStmt(X S) then
 			[] vareqStmt(X1 X2) then
 			[] valeqStmt(X V) then
@@ -176,6 +162,8 @@ end
 
 
 %%%%
+
+
 
 %% Abstract Syntax of Example programs.
 %% ---YOU WILL NEED TO WRITE SOME ADDITIONAL ONES TO COMPLETELY TEST YOUR CODE
