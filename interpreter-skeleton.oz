@@ -179,6 +179,77 @@ end
 
 %% Abstract Syntax of Example programs.
 %% ---YOU WILL NEED TO WRITE SOME ADDITIONAL ONES TO COMPLETELY TEST YOUR CODE
+fun {NewStack}
+   Stack={NewCell nil}
+   proc {Push X} S in {Exchange Stack S X|S} end
+   fun {Pop} X S in {Exchange Stack X|S S} X end
+   in
+      stack(push:Push pop:Pop)
+end
+
+fun {PopR S} case S of X|S1  then X#S1   end
+end
+
+fun {Reverse Xs}
+   case Xs
+   of nil then nil
+   [] X|Xr then
+      {Append {Reverse Xr} [X]}
+end
+end
+
+
+fun {CreateVal V E}
+   {Show "xxxxxxxxx"}
+end
+   
+local
+   Remove = Record.subtract
+   Add = fun{$ Fr X}
+	    {AdjoinAt Fr X unit}
+	 end
+   AddList = fun{$ Fr Xs}
+		{AdjoinList Fr {Map Xs fun{$ X} X#unit end}}
+	     end
+   SubtractList = fun{$ Fr Xs}
+		     {FoldL Xs fun {$ X Y} {Record.subtract X Y} end Fr}
+		end   
+
+   fun {FreeVars St Dest}
+      case St of skipStmt then Dest
+      [] seqStmt(S1 S2) then
+	 T={FreeVars S1 Dest} in 
+	 {FreeVars S2 T}
+      [] newvarStmt(X S) then
+	 T={FreeVars S Dest} in
+	 {Remove T X}
+      [] vareqStmt(X1 X2) then
+	 T={Add Dest X1} in
+	 {Add T X2}
+      [] valeqStmt(X V) then
+	 T in 
+	 case V of fdef(Xs S) then
+	    T={SubtractList {AddList {FreeVars S Dest} Xs} Xs}
+	 else T=Dest end
+	 {Add T X}
+      [] ifStmt(X S1 S2) then
+	 T1={Add Dest X}
+	 T2={FreeVars S1 T1} in
+	 {FreeVars S2 T2}
+      [] fappStmt(X Ys) then
+	 T={Add Dest X} in
+	 {AddList T Ys}
+      [] fprim(ExternalProcedure Args) then
+	 {AddList Dest ExternalProcedure|Args}
+      end
+   end
+in
+   fun {Free St}
+      Dest=freevars() in
+      {Record.arity {FreeVars St Dest}}
+   end
+end
+
 Program1 = newvarStmt('x' seqStmt(valeqStmt('x' false) seqStmt(ifStmt('x' skipStmt skipStmt) skipStmt)))
 Program2 = newvarStmt('x' seqStmt(valeqStmt('x' 26) fprim(cout ['x'])))
 %The following programs are from HW 4 Q# 5
