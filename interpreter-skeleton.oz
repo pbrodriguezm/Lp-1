@@ -142,14 +142,23 @@ proc {ExecuteStatement Stack}	% Executes each kernel statement
 				{Procedure.apply {LookupInStore {LookupInEnv X E}} Args}
 				NewStack = OutStack
 			[] seqStmt(S1 S2) then 
-	    		Stmt = {LookupInStor S1 S2} in 
-	    		{PopSemStack S2 S1}
+	    			Stmt = {LookupInStor S1 S2} in 
+	    			{PopSemStack S2 S1}
 	    		
 			[] newvarStmt(X S) then
+			    	Stmt={LookupInStor S T} in
+			    	{Remove T X}
+			    
 			[] vareqStmt(X1 X2) then
+				Stmt = {Add Stmt X1} in
+			    	{Add Stmt X1}
+	    
 			[] valeqStmt(X V) then
 			[] ifStmt(X S1 S2) then
+			
 			[] fappStmt(X Ys) then
+				Args={Map Ys fun {$ Y} {LookupInStore {LookupInEnv Y E}} end} in
+				{Procedure.apply {LookupInStore {LookupInEnv X E}} Args}
 			end
 			% Recursive call to ExecuteStatement with new Stack (if non-empty)
 		in
